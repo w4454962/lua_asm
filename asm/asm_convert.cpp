@@ -3,9 +3,28 @@
 #include <keystone\keystone.h>
 #include "asm_convert.h"
 #include "binary.h"
+#include <regex>
+
+std::regex g_reg("(\\w+)\\.(\\w+)");
+auto regex_end = std::sregex_iterator();
 
 bool asm_sym_resolver(const char* symbol, uint64_t* value)
 {
+    std::string str = symbol;
+    auto words_begin = std::sregex_iterator(str.begin(), str.end(), g_reg);
+
+    for (; words_begin != regex_end; ++words_begin)
+    {
+        std::string module_name = words_begin->str(1);
+        std::string proname = words_begin->str(2);
+        HMODULE handle = LoadLibraryA(module_name.c_str());
+        if (handle)
+        {
+            *value = (uint64_t)GetProcAddress(handle, proname.c_str());
+            return true;
+        }
+    }
+
     return false;
 }
 

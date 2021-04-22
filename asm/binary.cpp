@@ -28,7 +28,7 @@ static int lgetaddress(lua_State* L)
 
 
 double real_stack[0x100];
-int param_list[0x100];;
+uintptr_t param_list[0x100];;
 
 static int lcall(lua_State* L)
 {
@@ -50,10 +50,10 @@ static int lcall(lua_State* L)
 			input = param_count * 4;
 			for (int i = param_count; i > 0; i--)
 			{
-				int data = param_list[i];
+				uintptr_t data = param_list[i];
 				_asm push data
 			}
-			_asm call addr
+ 			_asm call addr
 			_asm mov value, eax
 			_asm add esp, input
 			input = 0;
@@ -65,6 +65,7 @@ static int lcall(lua_State* L)
 		{
 			if (input)
 				retval = lua_tointeger(L, param_count + 2);
+			
 			else
 				lua_pushinteger(L, value);
 			break;
@@ -85,11 +86,11 @@ static int lcall(lua_State* L)
 		{
 			if (input)
 				retval = (uint32_t)lua_tostring(L, param_count + 2);
+			
 			else
 				lua_pushstring(L, (const char*)value);
 			break;
 		}
-
 		case 'B':
 		{
 			if (input)

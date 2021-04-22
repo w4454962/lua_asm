@@ -3,9 +3,11 @@ local asm = require 'asm'
 
 
 local code = [[
+
     mov eax, [esp + 4] 
     mov ebx, [esp + 8]
     add eax, ebx
+    pos:
     ret 
 ]]
 local add_code = asm.to_binary(code, 100, '(II)I')

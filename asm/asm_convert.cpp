@@ -6,10 +6,9 @@
 #include <regex>
 #include <map>
 
-std::map<std::string, uint64_t> symbol_map;
+BinaryData* g_current;
 
-std::regex g_reg("(\\w+)\\.(\\w+)");
-auto regex_end = std::sregex_iterator();
+std::map<std::string, BinaryData*> symbol_map;
 
 bool asm_sym_resolver(const char* symbol, uint64_t* value)
 {
@@ -18,13 +17,23 @@ bool asm_sym_resolver(const char* symbol, uint64_t* value)
     auto it = symbol_map.find(str);
     if (it != symbol_map.end())
     {
-        *value = it->second;
+        auto* data = it->second;
+        *value = (uint64_t)data->code;
+
+        auto& map = g_current->ref_map;
+        if (map.find(str) == map.end())
+        {
+            data->ref_count++;
+            map[str] = data;
+        }
+       
         return true;
     }
 
-    auto words_begin = std::sregex_iterator(str.begin(), str.end(), g_reg);
-
-    for (; words_begin != regex_end; ++words_begin)
+    std::regex reg("(\\w+)\\.(\\w+)");
+    auto words_begin = std::sregex_iterator(str.begin(), str.end(), reg);
+    auto words_end = std::sregex_iterator();
+    for (; words_begin != words_end; ++words_begin)
     {
         std::string module_name = words_begin->str(1);
         std::string proname = words_begin->str(2);
@@ -42,8 +51,6 @@ bool asm_sym_resolver(const char* symbol, uint64_t* value)
 
 int lua_error_print(lua_State* L, const char* err, ...)
 {
-    printf(err, ((va_list)_ADDRESSOF(err) + _INTSIZEOF(err)));
-
     va_list ap;
     va_start(ap, err);
     lua_pushvfstring(L, err, ap);
@@ -56,9 +63,36 @@ int asm_to_binary(lua_State* L)
 {
     if (!lua_isstring(L, 1) || !lua_isinteger(L, 2))
         return 0;
+
+
     size_t buffer_size = lua_tointeger(L, 2);
     
     void* buffer = VirtualAlloc(NULL, buffer_size, MEM_RESERVE | MEM_COMMIT, PAGE_EXECUTE_READWRITE);
+
+
+    BinaryData** ptr = (BinaryData**)lua_newuserdata(L, sizeof(BinaryData*));
+    BinaryData* data = new BinaryData();
+    *ptr = data;
+    g_current = data;
+    data->size = buffer_size;
+    data->code = buffer;
+    if (lua_isstring(L, 3))
+    {
+        size_t len = 0;
+        const char* info = lua_tolstring(L, 3, &len);
+
+        strncpy(data->params, info, len > 256 ? 256 : len);
+    }
+
+    if (lua_isstring(L, 4))
+    {
+        size_t len = 0;
+        const char* info = lua_tolstring(L, 4, &len);
+
+        strncpy(data->name, info, len > 256 ? 256 : len);
+
+        symbol_map[data->name] = data;
+    }
 
     ks_engine* ks;
     ks_err err;
@@ -85,28 +119,8 @@ int asm_to_binary(lua_State* L)
     memcpy(buffer, encode, buffer_size < size ? buffer_size : size);
 
 
-    
-    BinaryData* data = (BinaryData*)lua_newuserdata(L, sizeof(BinaryData));
-    ZeroMemory(data, sizeof(BinaryData));
-    data->size = size;
-    data->code = buffer;
-    if (lua_isstring(L, 3))
-    {
-        size_t len = 0;
-        const char* info = lua_tolstring(L, 3, &len);
-
-        strncpy(data->params, info, len > 256 ? 256 : len);
-    }
-
-    if (lua_isstring(L, 4))
-    {
-        size_t len = 0;
-        const char* info = lua_tolstring(L, 4, &len);
-
-        strncpy(data->name, info, len > 256 ? 256 : len);
-
-        symbol_map[data->name] = (uint64_t)buffer;
-    }
+    data->code_size = size;
+   
     luaL_getmetatable(L, "binarydata");
 
     lua_setmetatable(L, -2);

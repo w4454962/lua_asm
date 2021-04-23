@@ -7,7 +7,7 @@ local code = [[
     jmp eax
 ]]
 
-local object = asm.to_binary(code, 100, '(ISSI)V')
+local object = asm.to_binary(code, 100, '(ISSI)V', 'xxx')
 
 function MessageBoxA(hwnd, text, title, flag)
     object:std_call(hwnd, text, title, flag)

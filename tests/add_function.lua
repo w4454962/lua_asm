@@ -97,13 +97,25 @@ local all_add_code = [[
     ret 
 ]]
 
-local all_add = asm.to_binary(all_add_code, 200, '()I')
-
-
 print('cdecl call', c_add(100, 200, 300))
 print('std call', std_add(100, 200, 300))
 print('this_call', this_add(100, 200, 300))
 print('fast_call', fast_add(100, 200, 300))
 
+local all_add = asm.to_binary(all_add_code, 100, '()I', 'aaa')
 local str = string.format("%x  %x", all_add:c_call(),  0x300+0x200+0x100+0x1000+0x2000+0x10000+0x20000+0x100000+0x200000)
 print(str)
+--[[
+local i = 0
+local t = {}
+while true do 
+i = i + 1 
+print(i)
+local all_add = asm.to_binary(all_add_code, 100, '()I', 'aaa')
+
+all_add = nil 
+collectgarbage("collect")
+local lua_memory = collectgarbage 'count'
+print(string.format("%.f",lua_memory))
+end 
+]]

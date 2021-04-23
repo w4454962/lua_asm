@@ -6,24 +6,61 @@
 #include <string>
 #include <Windows.h>
 #include <memory>
-
+#include <vector>
 int lua_error_print(lua_State* L, const char* err, ...);
+extern std::map<std::string, BinaryData*> symbol_map;
 
 static int ldelete(lua_State* L)
 {
-    BinaryData* data = (BinaryData*)luaL_checkudata(L, 1, "binarydata");
-    luaL_argcheck(L, data != NULL, 1, "invalid user data");
+    BinaryData** ptr = (BinaryData**)luaL_checkudata(L, 1, "binarydata");
+    luaL_argcheck(L, ptr != NULL, 1, "invalid user data");
+	BinaryData* data = *ptr;
 
-    delete data->code;
-    delete data;
+	if (data == nullptr)
+		return 0;
+
+	std::vector<std::string> list;
+
+	for (auto&& [k, v] : data->ref_map)
+	{
+		if (v != data && v->ref_count-- <= 0)
+		{
+			symbol_map.erase(k);
+			list.push_back(k);
+			if (v->code)
+			{
+				VirtualFree(v->code, data->size, MEM_DECOMMIT);
+				v->code = 0;
+			}
+			
+			delete v;
+		}
+	}
+	for (auto& k : list)
+	{
+		data->ref_map.erase(k);
+	}
+
+	if (data->ref_count-- <= 0)
+	{
+		symbol_map.erase(data->name);
+		if (data->code)
+		{
+			VirtualFree(data->code, data->size, MEM_DECOMMIT);
+			data->code = 0;
+		}
+		delete data;
+		*ptr = nullptr;
+	}
+	
     return 0;
 }
 
 static int lgetaddress(lua_State* L)
 {
-    BinaryData* data = (BinaryData*)luaL_checkudata(L, 1, "binarydata");
-    luaL_argcheck(L, data != NULL, 1, "invalid user data");
-
+    BinaryData** ptr = (BinaryData**)luaL_checkudata(L, 1, "binarydata");
+    luaL_argcheck(L, ptr != NULL, 1, "invalid user data");
+	BinaryData* data = *ptr;
     lua_pushinteger(L, (uintptr_t)data->code);
     return 1;
 }
@@ -132,9 +169,10 @@ uintptr_t call(CALL_TYPE type, uintptr_t func_address, const uintptr_t* param_li
 
 static int lcall(lua_State* L, CALL_TYPE type)
 {
-    BinaryData* data = (BinaryData*)luaL_checkudata(L, 1, "binarydata");
-    luaL_argcheck(L, data != NULL, 1, "invalid user data");
-    
+
+    BinaryData** ptr = (BinaryData**)luaL_checkudata(L, 1, "binarydata");
+    luaL_argcheck(L, ptr != NULL, 1, "invalid user data");
+	BinaryData* data = *ptr;
     const char* param = data->params;
 
 	double real_stack[0x100];

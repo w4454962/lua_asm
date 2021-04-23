@@ -29,7 +29,7 @@ static int ldelete(lua_State* L)
 			list.push_back(k);
 			if (v->code)
 			{
-				VirtualFree(v->code, data->size, MEM_DECOMMIT);
+				VirtualFree(v->code, 0, MEM_RELEASE);
 				v->code = 0;
 			}
 			
@@ -46,7 +46,7 @@ static int ldelete(lua_State* L)
 		symbol_map.erase(data->name);
 		if (data->code)
 		{
-			VirtualFree(data->code, data->size, MEM_DECOMMIT);
+			VirtualFree(data->code, 0, MEM_RELEASE);
 			data->code = 0;
 		}
 		delete data;

@@ -66,9 +66,8 @@ int asm_to_binary(lua_State* L)
 
 
     size_t buffer_size = lua_tointeger(L, 2);
-    
-    void* buffer = VirtualAlloc(NULL, buffer_size, MEM_RESERVE | MEM_COMMIT, PAGE_EXECUTE_READWRITE);
 
+    void* buffer = VirtualAlloc(NULL, buffer_size, MEM_RESERVE | MEM_COMMIT, PAGE_EXECUTE_READWRITE);
 
     BinaryData** ptr = (BinaryData**)lua_newuserdata(L, sizeof(BinaryData*));
     BinaryData* data = new BinaryData();

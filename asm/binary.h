@@ -13,7 +13,8 @@ struct BinaryData
 {
     size_t size;
     void* code;
-    char info[256];
+    char params[256];
+    char name[256];
 };
 
 int register_binary_class(lua_State* L);

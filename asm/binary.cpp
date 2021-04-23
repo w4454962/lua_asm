@@ -33,7 +33,8 @@ static int lgetaddress(lua_State* L)
 
 uintptr_t c_call(uintptr_t func_address, const uintptr_t* param_list, size_t param_list_size)
 {
-	uintptr_t retval;
+	uintptr_t retval = 0;
+
 	for (size_t i = param_list_size; i > 0; i -= intval)
 	{
 		uintptr_t data = *(uintptr_t*)((uintptr_t)param_list + i - intval);
@@ -51,6 +52,7 @@ uintptr_t c_call(uintptr_t func_address, const uintptr_t* param_list, size_t par
 uintptr_t std_call(uintptr_t func_address, const uintptr_t* param_list, size_t param_list_size)
 {
 	uintptr_t retval;
+	
 	for (size_t i = param_list_size; i > 0; i -= intval)
 	{
 		uintptr_t data = *(uintptr_t*)((uintptr_t)param_list + i - intval);
@@ -60,7 +62,7 @@ uintptr_t std_call(uintptr_t func_address, const uintptr_t* param_list, size_t p
 	{
 		call func_address
 		mov retval, eax
-	}
+	} 
 	return retval;
 }
 uintptr_t this_call(uintptr_t func_address, const uintptr_t* param_list, size_t param_list_size)
@@ -133,7 +135,7 @@ static int lcall(lua_State* L, CALL_TYPE type)
     BinaryData* data = (BinaryData*)luaL_checkudata(L, 1, "binarydata");
     luaL_argcheck(L, data != NULL, 1, "invalid user data");
     
-    const char* param = data->info;
+    const char* param = data->params;
 
 	double real_stack[0x100];
 	uintptr_t param_list[0x100];;

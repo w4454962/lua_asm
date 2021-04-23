@@ -4,6 +4,9 @@
 #include "asm_convert.h"
 #include "binary.h"
 #include <regex>
+#include <map>
+
+std::map<std::string, uint64_t> symbol_map;
 
 std::regex g_reg("(\\w+)\\.(\\w+)");
 auto regex_end = std::sregex_iterator();
@@ -11,6 +14,14 @@ auto regex_end = std::sregex_iterator();
 bool asm_sym_resolver(const char* symbol, uint64_t* value)
 {
     std::string str = symbol;
+
+    auto it = symbol_map.find(str);
+    if (it != symbol_map.end())
+    {
+        *value = it->second;
+        return true;
+    }
+
     auto words_begin = std::sregex_iterator(str.begin(), str.end(), g_reg);
 
     for (; words_begin != regex_end; ++words_begin)
@@ -31,6 +42,8 @@ bool asm_sym_resolver(const char* symbol, uint64_t* value)
 
 int lua_error_print(lua_State* L, const char* err, ...)
 {
+    printf(err, ((va_list)_ADDRESSOF(err) + _INTSIZEOF(err)));
+
     va_list ap;
     va_start(ap, err);
     lua_pushvfstring(L, err, ap);
@@ -43,7 +56,6 @@ int asm_to_binary(lua_State* L)
 {
     if (!lua_isstring(L, 1) || !lua_isinteger(L, 2))
         return 0;
-    
     size_t buffer_size = lua_tointeger(L, 2);
     
     void* buffer = VirtualAlloc(NULL, buffer_size, MEM_RESERVE | MEM_COMMIT, PAGE_EXECUTE_READWRITE);
@@ -83,9 +95,18 @@ int asm_to_binary(lua_State* L)
         size_t len = 0;
         const char* info = lua_tolstring(L, 3, &len);
 
-        strncpy(data->info, info, len > 256 ? 256 : len);
+        strncpy(data->params, info, len > 256 ? 256 : len);
     }
 
+    if (lua_isstring(L, 4))
+    {
+        size_t len = 0;
+        const char* info = lua_tolstring(L, 4, &len);
+
+        strncpy(data->name, info, len > 256 ? 256 : len);
+
+        symbol_map[data->name] = (uint64_t)buffer;
+    }
     luaL_getmetatable(L, "binarydata");
 
     lua_setmetatable(L, -2);
@@ -94,6 +115,5 @@ int asm_to_binary(lua_State* L)
 
     // close Keystone instance when done
     ks_close(ks);
-
     return 1;
 }

@@ -2,6 +2,13 @@
 
 #include <lua.hpp>
 
+enum CALL_TYPE
+{
+    C_CALL,
+    STD_CALL ,
+    THIS_CALL,
+    FAST_CALL,
+};
 struct BinaryData
 {
     size_t size;

@@ -2,10 +2,12 @@
 #include "stdlib.h"
 
 #include "binary.h"
-#include "fp_call.h"
+
 #include <string>
 #include <Windows.h>
 #include <memory>
+
+int lua_error_print(lua_State* L, const char* err, ...);
 
 static int ldelete(lua_State* L)
 {
@@ -27,35 +29,124 @@ static int lgetaddress(lua_State* L)
 }
 
 
-double real_stack[0x100];
-uintptr_t param_list[0x100];;
+#define intval sizeof uintptr_t
 
-static int lcall(lua_State* L)
+uintptr_t c_call(uintptr_t func_address, const uintptr_t* param_list, size_t param_list_size)
+{
+	uintptr_t retval;
+	for (size_t i = param_list_size; i > 0; i -= intval)
+	{
+		uintptr_t data = *(uintptr_t*)((uintptr_t)param_list + i - intval);
+		_asm push data 
+	}
+	_asm
+	{
+		call func_address
+		add esp, param_list_size
+		mov retval, eax 
+	}
+	return retval;
+}
+
+uintptr_t std_call(uintptr_t func_address, const uintptr_t* param_list, size_t param_list_size)
+{
+	uintptr_t retval;
+	for (size_t i = param_list_size; i > 0; i -= intval)
+	{
+		uintptr_t data = *(uintptr_t*)((uintptr_t)param_list + i - intval);
+		_asm push data
+	}
+	_asm
+	{
+		call func_address
+		mov retval, eax
+	}
+	return retval;
+}
+uintptr_t this_call(uintptr_t func_address, const uintptr_t* param_list, size_t param_list_size)
+{
+	uintptr_t retval;
+	uintptr_t first = param_list[0];
+	for (size_t i = param_list_size; i > intval; i -= intval)
+	{
+		uintptr_t data = *(uintptr_t*)((uintptr_t)param_list + i - intval);
+		_asm push data
+	}
+	param_list_size -= intval;
+	_asm
+	{
+		mov ecx, first
+		call func_address
+		add esp, param_list_size
+		mov retval, eax
+	}
+	return retval;
+}
+
+uintptr_t fast_call(uintptr_t func_address, const uintptr_t* param_list, size_t param_list_size)
+{
+	uintptr_t retval;
+	uintptr_t first = param_list[0];
+	uintptr_t second = param_list[1];
+	for (size_t i = param_list_size; i > intval * 2; i -= intval)
+	{
+		uintptr_t data = *(uintptr_t*)((uintptr_t)param_list + i - intval);
+		_asm push data
+	}
+	param_list_size -= intval * 2;
+	_asm
+	{
+		mov ecx, first
+		mov edx, second
+		call func_address
+		add esp, param_list_size
+		mov retval, eax
+	}
+	return retval;
+}
+
+
+uintptr_t call(CALL_TYPE type, uintptr_t func_address, const uintptr_t* param_list, size_t param_list_size)
+{
+	switch (type)
+	{
+	case C_CALL:
+		return c_call(func_address, param_list, param_list_size);
+		break;
+	case STD_CALL:
+		return std_call(func_address, param_list, param_list_size);
+		break;
+	case THIS_CALL:
+		return this_call(func_address, param_list, param_list_size);
+		break;
+	case FAST_CALL:
+		return fast_call(func_address, param_list, param_list_size);
+		break;
+	default:
+		break;
+	}
+	return 0;
+}
+
+static int lcall(lua_State* L, CALL_TYPE type)
 {
     BinaryData* data = (BinaryData*)luaL_checkudata(L, 1, "binarydata");
     luaL_argcheck(L, data != NULL, 1, "invalid user data");
     
     const char* param = data->info;
 
-	int input = 0, value = 0, param_count = 0;
+	double real_stack[0x100];
+	uintptr_t param_list[0x100];;
+	uintptr_t input = 0, value = 0, param_count = 0;
 	ZeroMemory(param_list, sizeof(param_list));
-	uintptr_t addr = (uintptr_t)data->code;
-	
+
 	for (int i = 0; i < (int)strlen(param); i++)
 	{
-		uint32_t retval = 0;
+		uintptr_t pushvalue = 0;
 		switch (param[i])
 		{
 		case ')':
-			input = param_count * 4;
-			for (int i = param_count; i > 0; i--)
-			{
-				uintptr_t data = param_list[i];
-				_asm push data
-			}
- 			_asm call addr
-			_asm mov value, eax
-			_asm add esp, input
+			value = call(type, (uintptr_t)data->code, param_list, param_count * sizeof(uintptr_t));
 			input = 0;
 			break;
 		case '(':
@@ -64,8 +155,7 @@ static int lcall(lua_State* L)
 		case 'I':
 		{
 			if (input)
-				retval = lua_tointeger(L, param_count + 2);
-			
+				pushvalue = lua_tointeger(L, param_count + 2);
 			else
 				lua_pushinteger(L, value);
 			break;
@@ -76,7 +166,7 @@ static int lcall(lua_State* L)
 			{
 
 				real_stack[param_count] = lua_tonumber(L, param_count + 2);
-				retval = (uint32_t)&real_stack[param_count];
+				pushvalue = (uint32_t)&real_stack[param_count];
 			}
 			else
 				lua_pushnumber(L, *(double*)&value);
@@ -85,7 +175,7 @@ static int lcall(lua_State* L)
 		case 'S':
 		{
 			if (input)
-				retval = (uint32_t)lua_tostring(L, param_count + 2);
+				pushvalue = (uint32_t)lua_tostring(L, param_count + 2);
 			
 			else
 				lua_pushstring(L, (const char*)value);
@@ -94,7 +184,7 @@ static int lcall(lua_State* L)
 		case 'B':
 		{
 			if (input)
-				retval = lua_toboolean(L, param_count + 2);
+				pushvalue = lua_toboolean(L, param_count + 2);
 			else
 				lua_pushboolean(L, value);
 			break;
@@ -106,12 +196,37 @@ static int lcall(lua_State* L)
 
 		if (input && param[i] != ')' && param[i] != '(')
 		{
-			param_count++;
-			param_list[param_count] = retval;
+			param_list[param_count++] = pushvalue;
 		}
 		
 	}
 	return 1;
+}
+
+int lua_c_call(lua_State* L)
+{
+	return lcall(L, C_CALL);
+}
+
+int lua_std_call(lua_State* L)
+{
+	return lcall(L, STD_CALL);
+}
+
+int lua_this_call(lua_State* L)
+{
+	if (lua_gettop(L) < 2)
+		lua_error_print(L, "miss parameter");
+
+	return lcall(L, THIS_CALL);
+}
+
+int lua_fast_call(lua_State* L)
+{
+	if (lua_gettop(L) < 3)
+		lua_error_print(L, "miss parameter");
+	
+	return lcall(L, FAST_CALL);
 }
 
 int register_binary_class(lua_State* L)
@@ -127,8 +242,20 @@ int register_binary_class(lua_State* L)
     lua_pushcfunction(L, lgetaddress);
     lua_setfield(L, -2, "get_address");
 
-    lua_pushcfunction(L, lcall);
+	lua_pushcfunction(L, lua_c_call);
+	lua_setfield(L, -2, "__call");
+
+    lua_pushcfunction(L, lua_c_call);
     lua_setfield(L, -2, "c_call");
+
+	lua_pushcfunction(L, lua_std_call);
+	lua_setfield(L, -2, "std_call");
+
+	lua_pushcfunction(L, lua_this_call);
+	lua_setfield(L, -2, "this_call");
+
+	lua_pushcfunction(L, lua_fast_call);
+	lua_setfield(L, -2, "fast_call");
 
     return 1;
 }

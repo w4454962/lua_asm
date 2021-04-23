@@ -37,8 +37,5 @@
     <ClInclude Include="binary.h">
       <Filter>源文件</Filter>
     </ClInclude>
-    <ClInclude Include="fp_call.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
   </ItemGroup>
 </Project>

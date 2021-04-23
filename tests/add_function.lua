@@ -1,22 +1,69 @@
-
 local asm = require 'asm'
 
-
-local code = [[
-
-    mov eax, [esp + 4] 
-    mov ebx, [esp + 8]
+--cdecl call 
+local cdecl_code = [[
+    mov eax, [esp + 0x4] 
+    mov ebx, [esp + 0x8]
+    mov ecx, [esp + 0xc]
     add eax, ebx
-    ret 
+    add eax, ecx
+    ret  
 ]]
-local add_code = asm.to_binary(code, 100, '(II)I')
 
+local cdecl_code_object = asm.to_binary(cdecl_code, 100, '(III)I')
 
-local function add(a, b)
-    return add_code:c_call(a, b)
+function c_add(a, b, c)
+    return cdecl_code_object:c_call(a, b, c)
+end 
+
+--std call 
+local std_code = [[
+    mov eax, [esp + 0x4] 
+    mov ebx, [esp + 0x8]
+    mov ecx, [esp + 0xc]
+    add eax, ebx
+    add eax, ecx
+    ret  0xC
+]]
+
+local std_code = asm.to_binary(cdecl_code, 100, '(III)I')
+
+function std_add(a, b, c)
+    return std_code:c_call(a, b, c)
 end 
 
 
-print(add(5, 6))
 
-print(add(1, 3))
+--this call 
+local this_code = [[
+    mov eax, [esp + 0x4] 
+    mov ebx, [esp + 0x8]
+    add eax, ebx
+    add eax, ecx 
+    ret 
+]]
+
+local this_code_object = asm.to_binary(this_code, 100, '(III)I')
+
+function this_add(a, b, c)
+    return this_code_object:this_call(a, b, c)
+end 
+
+
+--fast call 
+local fast_code = [[
+    mov eax, [esp + 0x4] 
+    add ecx, edx 
+    add eax, ecx 
+    ret
+]]
+local fast_code_object = asm.to_binary(fast_code, 100, '(III)I')
+
+function fast_add(a, b, c)
+    return fast_code_object:fast_call(a, b, c)
+end 
+
+print('cdecl call', c_add(100, 200, 300))
+print('std call', std_add(100, 200, 300))
+print('this_call', this_add(100, 200, 300))
+print('fast_call', fast_add(100, 200, 300))

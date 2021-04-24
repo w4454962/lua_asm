@@ -149,16 +149,16 @@ uintptr_t call(CALL_TYPE type, uintptr_t func_address, const uintptr_t* param_li
 {
 	switch (type)
 	{
-	case C_CALL:
+	case CALL_TYPE::C_CALL:
 		return c_call(func_address, param_list, param_list_size);
 		break;
-	case STD_CALL:
+	case CALL_TYPE::STD_CALL:
 		return std_call(func_address, param_list, param_list_size);
 		break;
-	case THIS_CALL:
+	case CALL_TYPE::THIS_CALL:
 		return this_call(func_address, param_list, param_list_size);
 		break;
-	case FAST_CALL:
+	case CALL_TYPE::FAST_CALL:
 		return fast_call(func_address, param_list, param_list_size);
 		break;
 	default:
@@ -245,12 +245,12 @@ static int lcall(lua_State* L, CALL_TYPE type)
 
 int lua_c_call(lua_State* L)
 {
-	return lcall(L, C_CALL);
+	return lcall(L, CALL_TYPE::C_CALL);
 }
 
 int lua_std_call(lua_State* L)
 {
-	return lcall(L, STD_CALL);
+	return lcall(L, CALL_TYPE::STD_CALL);
 }
 
 int lua_this_call(lua_State* L)
@@ -258,7 +258,7 @@ int lua_this_call(lua_State* L)
 	if (lua_gettop(L) < 2)
 		lua_error_print(L, "miss parameter");
 
-	return lcall(L, THIS_CALL);
+	return lcall(L, CALL_TYPE::THIS_CALL);
 }
 
 int lua_fast_call(lua_State* L)
@@ -266,7 +266,18 @@ int lua_fast_call(lua_State* L)
 	if (lua_gettop(L) < 3)
 		lua_error_print(L, "miss parameter");
 	
-	return lcall(L, FAST_CALL);
+	return lcall(L, CALL_TYPE::FAST_CALL);
+}
+
+
+
+int lua_default_call(lua_State* L)
+{
+	BinaryData** ptr = (BinaryData**)luaL_checkudata(L, 1, "binarydata");
+	luaL_argcheck(L, ptr != NULL, 1, "invalid user data");
+	BinaryData* data = *ptr;
+
+	return lcall(L, data->type);
 }
 
 int register_binary_class(lua_State* L)
@@ -282,7 +293,7 @@ int register_binary_class(lua_State* L)
     lua_pushcfunction(L, lgetaddress);
     lua_setfield(L, -2, "get_address");
 
-	lua_pushcfunction(L, lua_c_call);
+	lua_pushcfunction(L, lua_default_call);
 	lua_setfield(L, -2, "__call");
 
     lua_pushcfunction(L, lua_c_call);

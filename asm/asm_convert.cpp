@@ -37,7 +37,8 @@ bool asm_sym_resolver(const char* symbol, uint64_t* value)
     {
         std::string module_name = words_begin->str(1);
         std::string proname = words_begin->str(2);
-        HMODULE handle = LoadLibraryA(module_name.c_str());
+        HMODULE handle = GetModuleHandleA(module_name.c_str());
+        if (!handle) handle = LoadLibraryA(module_name.c_str());
         if (handle)
         {
             *value = (uint64_t)GetProcAddress(handle, proname.c_str());
@@ -91,6 +92,20 @@ int asm_to_binary(lua_State* L)
         strncpy(data->name, info, len > 256 ? 256 : len);
 
         symbol_map[data->name] = data;
+    }
+    if (lua_isstring(L, 5))
+    {
+        const char* calltype = lua_tostring(L, 5);
+
+        data->type = CALL_TYPE::C_CALL;
+        if (strcmp(calltype, "__stdcall") == 0)
+            data->type = CALL_TYPE::STD_CALL;
+
+        else if (strcmp(calltype, "__thiscall") == 0)
+            data->type = CALL_TYPE::THIS_CALL;
+
+        else if (strcmp(calltype, "__fastcall") == 0)
+            data->type = CALL_TYPE::THIS_CALL;
     }
 
     ks_engine* ks;

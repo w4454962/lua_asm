@@ -4,7 +4,7 @@
 #include <map>
 #include <string>
 
-enum CALL_TYPE
+enum class CALL_TYPE
 {
     C_CALL,
     STD_CALL ,
@@ -18,6 +18,7 @@ struct BinaryData
     size_t code_size;
     char params[256];
     char name[256];
+    CALL_TYPE type;
     int ref_count;
     std::map<std::string, struct BinaryData*> ref_map;
 };

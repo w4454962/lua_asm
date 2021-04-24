@@ -90,5 +90,7 @@ int luaopen_asm(lua_State * L)
 
     lua_setmetatable(L, -2);
 
+   
+
     return 1;
 }

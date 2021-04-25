@@ -100,6 +100,8 @@ int asm_to_binary(lua_State* L)
 
         else if (strcmp(calltype, "__fastcall") == 0)
             data->type = CALL_TYPE::FAST_CALL;
+        else if (strcmp(calltype, "__cdeclcall") == 0)
+            data->type = CALL_TYPE::C_CALL;
     }
 
     ks_engine* ks;

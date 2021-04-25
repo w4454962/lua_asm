@@ -40,12 +40,6 @@
     <ClInclude Include="binary.h">
       <Filter>源文件</Filter>
     </ClInclude>
-    <ClInclude Include="loop.h">
-      <Filter>源文件</Filter>
-    </ClInclude>
-    <ClInclude Include="fp_call.h">
-      <Filter>源文件</Filter>
-    </ClInclude>
     <ClInclude Include="fp_call2.h">
       <Filter>源文件</Filter>
     </ClInclude>

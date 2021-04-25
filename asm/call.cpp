@@ -140,7 +140,6 @@ uintptr_t this_call(uintptr_t func_address, const uintptr_t* param_list, size_t 
 	{
 		mov ecx, first
 		call func_address
-		add esp, param_list_size
 		mov retval, eax
 	}
 	return retval;

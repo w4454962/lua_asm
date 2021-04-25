@@ -10,11 +10,8 @@ local cdecl_code = [[
     ret  
 ]]
 
-local cdecl_code_object = asm.to_binary(cdecl_code, '(III)I', 'c_add')
+local c_add = asm.to_binary(cdecl_code, '(III)I', 'c_add', '__cdeclcall')
 
-function c_add(a, b, c)
-    return cdecl_code_object:c_call(a, b, c)
-end 
 
 --std call 
 local std_code = [[
@@ -26,11 +23,8 @@ local std_code = [[
     ret  0xC
 ]]
 
-local std_code = asm.to_binary(std_code, '(III)I', 'std_add')
+local std_add = asm.to_binary(std_code, '(III)I', 'std_add', '__stdcall')
 
-function std_add(a, b, c)
-    return std_code:std_call(a, b, c)
-end 
 
 --this call 
 local this_code = [[
@@ -41,11 +35,7 @@ local this_code = [[
     ret 0x8
 ]]
 
-local this_code_object = asm.to_binary(this_code, '(III)I', 'this_add')
-
-function this_add(a, b, c)
-    return this_code_object:this_call(a, b, c)
-end 
+local this_add = asm.to_binary(this_code, '(III)I', 'this_add', '__thiscall')
 
 
 --fast call 
@@ -55,12 +45,7 @@ local fast_code = [[
     add eax, ecx 
     ret 0x4
 ]]
-local fast_code_object = asm.to_binary(fast_code, '(III)I', 'fast_add')
-
-function fast_add(a, b, c)
-    return fast_code_object:fast_call(a, b, c)
-end 
-
+local fast_add = asm.to_binary(fast_code, '(III)I', 'fast_add', '__fastcall')
 
 
 
@@ -101,7 +86,7 @@ print('std call', std_add(100, 200, 300))
 print('this_call', this_add(100, 200, 300))
 print('fast_call', fast_add(100, 200, 300))
 
-local all_add = asm.to_binary(all_add_code, '()I', 'aaa')
-local str = string.format("%x  %x", all_add:c_call(),  0x300+0x200+0x100+0x1000+0x2000+0x10000+0x20000+0x100000+0x200000)
+local all_add = asm.to_binary(all_add_code, '()I', 'aaa', '__cdeclcall')
+local str = string.format("%x  %x", all_add(),  0x300+0x200+0x100+0x1000+0x2000+0x10000+0x20000+0x100000+0x200000)
 print(str)
 

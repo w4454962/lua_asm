@@ -1,91 +1,83 @@
-#include "fpcall2.h"
+
+#include "fp_call2.h"
 #include <boost/preprocessor/repetition.hpp>
 #include <boost/preprocessor/iteration/local.hpp>
-
 
 #define intval sizeof uintptr_t
 
 
-#define MAX_COUNT 30
+#define MAX_COUNT 16
 
-#define BOOST_PP_LOCAL_MACRO(n)     uintptr_t(__cdecl *c_callfunc##n)(BOOST_PP_ENUM_BINARY_PARAMS(n, uintptr_t BOOST_PP_INTERCEPT, BOOST_PP_INTERCEPT)); 
+#define BOOST_PP_LOCAL_MACRO(n)     typedef uintptr_t(__cdecl *c_callfunc##n)(BOOST_PP_ENUM_BINARY_PARAMS(n, uintptr_t BOOST_PP_INTERCEPT, BOOST_PP_INTERCEPT)); 
 #define BOOST_PP_LOCAL_LIMITS (0, MAX_COUNT)
 #include BOOST_PP_LOCAL_ITERATE()
 
 
-#define BOOST_PP_LOCAL_MACRO(n)     uintptr_t(__stdcall *std_callfunc##n)(BOOST_PP_ENUM_BINARY_PARAMS(n, uintptr_t BOOST_PP_INTERCEPT, BOOST_PP_INTERCEPT)); 
+#define BOOST_PP_LOCAL_MACRO(n)     typedef uintptr_t(__stdcall *std_callfunc##n)(BOOST_PP_ENUM_BINARY_PARAMS(n, uintptr_t BOOST_PP_INTERCEPT, BOOST_PP_INTERCEPT)); 
 #define BOOST_PP_LOCAL_LIMITS (0, MAX_COUNT)
 #include BOOST_PP_LOCAL_ITERATE()
 
-#define BOOST_PP_LOCAL_MACRO(n)     uintptr_t(__fastcall *fast_callfunc##n)(BOOST_PP_ENUM_BINARY_PARAMS(n, uintptr_t BOOST_PP_INTERCEPT, BOOST_PP_INTERCEPT)); 
-#define BOOST_PP_LOCAL_LIMITS (2, MAX_COUNT)
+#define BOOST_PP_LOCAL_MACRO(n)     typedef uintptr_t(__fastcall *fast_callfunc##n)(BOOST_PP_ENUM_BINARY_PARAMS(n, uintptr_t BOOST_PP_INTERCEPT, BOOST_PP_INTERCEPT)); 
+#define BOOST_PP_LOCAL_LIMITS (0, MAX_COUNT)
 #include BOOST_PP_LOCAL_ITERATE()
 
 
-#define BOOST_PP_LOCAL_MACRO(n)     uintptr_t(__thiscall *this_callfunc##n)(BOOST_PP_ENUM_BINARY_PARAMS(n, uintptr_t BOOST_PP_INTERCEPT, BOOST_PP_INTERCEPT)); 
-#define BOOST_PP_LOCAL_LIMITS (2, MAX_COUNT)
+#define BOOST_PP_LOCAL_MACRO(n)     typedef uintptr_t(__thiscall *this_callfunc##n)(BOOST_PP_ENUM_BINARY_PARAMS(n, uintptr_t BOOST_PP_INTERCEPT, BOOST_PP_INTERCEPT)); 
+#define BOOST_PP_LOCAL_LIMITS (0, MAX_COUNT)
 #include BOOST_PP_LOCAL_ITERATE()
 
 
 uintptr_t c_call(uintptr_t func_address, const uintptr_t* param_list, size_t param_list_size)
 {
-	uintptr_t retval = 0;
-
 	switch (param_list_size / intval)
 	{
-#define BOOST_PP_LOCAL_MACRO(n)     case n: c_callfunc##n = decltype(c_callfunc##n)(func_address); retval = c_callfunc##n(BOOST_PP_ENUM_BINARY_PARAMS(n, param_list[,] BOOST_PP_INTERCEPT)); break;
+#define BOOST_PP_LOCAL_MACRO(n)     case n: return ((c_callfunc##n)(func_address))(BOOST_PP_ENUM_BINARY_PARAMS(n, param_list[,] BOOST_PP_INTERCEPT));
 #define BOOST_PP_LOCAL_LIMITS (0, MAX_COUNT)
 #include BOOST_PP_LOCAL_ITERATE()
 	default:
 		break;
 	}
-	return retval;
+	return 0;
 }
 
 uintptr_t std_call(uintptr_t func_address, const uintptr_t* param_list, size_t param_list_size)
 {
-	uintptr_t retval = 0;
-
 	switch (param_list_size / intval)
 	{
-#define BOOST_PP_LOCAL_MACRO(n)     case n: std_callfunc##n = decltype(std_callfunc##n)(func_address); retval = std_callfunc##n(BOOST_PP_ENUM_BINARY_PARAMS(n, param_list[,] BOOST_PP_INTERCEPT)); break;
+#define BOOST_PP_LOCAL_MACRO(n)     case n: return ((std_callfunc##n)(func_address))(BOOST_PP_ENUM_BINARY_PARAMS(n, param_list[,] BOOST_PP_INTERCEPT));
 #define BOOST_PP_LOCAL_LIMITS (0, MAX_COUNT)
 #include BOOST_PP_LOCAL_ITERATE()
 	default:
 		break;
 	}
-	return retval;
+	return 0;
 }
 
 uintptr_t fast_call(uintptr_t func_address, const uintptr_t* param_list, size_t param_list_size)
 {
-	uintptr_t retval = 0;
-
 	switch (param_list_size / intval)
 	{
-#define BOOST_PP_LOCAL_MACRO(n)     case n: fast_callfunc##n = decltype(fast_callfunc##n)(func_address); retval = fast_callfunc##n(BOOST_PP_ENUM_BINARY_PARAMS(n, param_list[,] BOOST_PP_INTERCEPT)); break;
-#define BOOST_PP_LOCAL_LIMITS (2, MAX_COUNT)
+#define BOOST_PP_LOCAL_MACRO(n)     case n: return ((fast_callfunc##n)(func_address))(BOOST_PP_ENUM_BINARY_PARAMS(n, param_list[,] BOOST_PP_INTERCEPT));
+#define BOOST_PP_LOCAL_LIMITS (0, MAX_COUNT)
 #include BOOST_PP_LOCAL_ITERATE()
 	default:
 		break;
 	}
-	return retval;
+	return 0;
 }
 
 
 uintptr_t this_call(uintptr_t func_address, const uintptr_t* param_list, size_t param_list_size)
 {
-	uintptr_t retval = 0;
-
 	switch (param_list_size / intval)
 	{
-#define BOOST_PP_LOCAL_MACRO(n)     case n: this_callfunc##n = decltype(this_callfunc##n)(func_address); retval = this_callfunc##n(BOOST_PP_ENUM_BINARY_PARAMS(n, param_list[,] BOOST_PP_INTERCEPT)); break;
-#define BOOST_PP_LOCAL_LIMITS (2, MAX_COUNT)
+#define BOOST_PP_LOCAL_MACRO(n)     case n: return ((this_callfunc##n)(func_address))(BOOST_PP_ENUM_BINARY_PARAMS(n, param_list[,] BOOST_PP_INTERCEPT));
+#define BOOST_PP_LOCAL_LIMITS (0, MAX_COUNT)
 #include BOOST_PP_LOCAL_ITERATE()
 	default:
 		break;
 	}
-	return retval;
+	return 0;
 }
 
 

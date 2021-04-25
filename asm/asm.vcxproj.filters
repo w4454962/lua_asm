@@ -24,7 +24,7 @@
     <ClCompile Include="binary.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="fpcall2.cpp">
+    <ClCompile Include="fp_call2.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
@@ -43,7 +43,10 @@
     <ClInclude Include="loop.h">
       <Filter>源文件</Filter>
     </ClInclude>
-    <ClInclude Include="fpcall2.h">
+    <ClInclude Include="fp_call.h">
+      <Filter>源文件</Filter>
+    </ClInclude>
+    <ClInclude Include="fp_call2.h">
       <Filter>源文件</Filter>
     </ClInclude>
   </ItemGroup>

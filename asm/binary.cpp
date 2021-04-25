@@ -7,7 +7,7 @@
 #include <Windows.h>
 #include <memory>
 #include <vector>
-#include "fpcall2.h"
+#include "fp_call2.h"
 
 int lua_error_print(lua_State* L, const char* err, ...);
 extern std::map<std::string, BinaryData*> symbol_map;

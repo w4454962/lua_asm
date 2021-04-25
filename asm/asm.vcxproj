@@ -162,7 +162,7 @@
   <ItemGroup>
     <ClCompile Include="asm_convert.cpp" />
     <ClCompile Include="binary.cpp" />
-    <ClCompile Include="fpcall2.cpp" />
+    <ClCompile Include="fp_call2.cpp" />
     <ClCompile Include="dllmain.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -171,7 +171,8 @@
   <ItemGroup>
     <ClInclude Include="asm_convert.h" />
     <ClInclude Include="binary.h" />
-    <ClInclude Include="fpcall2.h" />
+    <ClInclude Include="fp_call2.h" />
+    <ClInclude Include="fp_call.h" />
     <ClInclude Include="loop.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

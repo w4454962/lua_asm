@@ -8,21 +8,21 @@
 
 #define MAX_COUNT 30
 
-#define BOOST_PP_LOCAL_MACRO(n)     uintptr_t(__cdecl *c_callfunc ##n)(BOOST_PP_ENUM_BINARY_PARAMS(n, uintptr_t BOOST_PP_INTERCEPT, BOOST_PP_INTERCEPT)); 
+#define BOOST_PP_LOCAL_MACRO(n)     uintptr_t(__cdecl *c_callfunc##n)(BOOST_PP_ENUM_BINARY_PARAMS(n, uintptr_t BOOST_PP_INTERCEPT, BOOST_PP_INTERCEPT)); 
 #define BOOST_PP_LOCAL_LIMITS (0, MAX_COUNT)
 #include BOOST_PP_LOCAL_ITERATE()
 
 
-#define BOOST_PP_LOCAL_MACRO(n)     uintptr_t(__stdcall *std_callfunc ##n)(BOOST_PP_ENUM_BINARY_PARAMS(n, uintptr_t BOOST_PP_INTERCEPT, BOOST_PP_INTERCEPT)); 
+#define BOOST_PP_LOCAL_MACRO(n)     uintptr_t(__stdcall *std_callfunc##n)(BOOST_PP_ENUM_BINARY_PARAMS(n, uintptr_t BOOST_PP_INTERCEPT, BOOST_PP_INTERCEPT)); 
 #define BOOST_PP_LOCAL_LIMITS (0, MAX_COUNT)
 #include BOOST_PP_LOCAL_ITERATE()
 
-#define BOOST_PP_LOCAL_MACRO(n)     uintptr_t(__fastcall *fast_callfunc ##n)(BOOST_PP_ENUM_BINARY_PARAMS(n, uintptr_t BOOST_PP_INTERCEPT, BOOST_PP_INTERCEPT)); 
+#define BOOST_PP_LOCAL_MACRO(n)     uintptr_t(__fastcall *fast_callfunc##n)(BOOST_PP_ENUM_BINARY_PARAMS(n, uintptr_t BOOST_PP_INTERCEPT, BOOST_PP_INTERCEPT)); 
 #define BOOST_PP_LOCAL_LIMITS (2, MAX_COUNT)
 #include BOOST_PP_LOCAL_ITERATE()
 
 
-#define BOOST_PP_LOCAL_MACRO(n)     uintptr_t(__thiscall *this_callfunc ##n)(BOOST_PP_ENUM_BINARY_PARAMS(n, uintptr_t BOOST_PP_INTERCEPT, BOOST_PP_INTERCEPT)); 
+#define BOOST_PP_LOCAL_MACRO(n)     uintptr_t(__thiscall *this_callfunc##n)(BOOST_PP_ENUM_BINARY_PARAMS(n, uintptr_t BOOST_PP_INTERCEPT, BOOST_PP_INTERCEPT)); 
 #define BOOST_PP_LOCAL_LIMITS (2, MAX_COUNT)
 #include BOOST_PP_LOCAL_ITERATE()
 

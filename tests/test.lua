@@ -4,7 +4,7 @@ require 'add_function'
 
 local asm = require 'asm'
 print('111111')
-local LoadLibraryA = asm.to_binary("mov eax, kernel32.LoadLibraryA\n jmp eax", 20, '(S)I', "LoadLibrary", "__stdcall")
+local LoadLibraryA = asm.to_binary("mov eax, kernel32.LoadLibraryA\n jmp eax", '(S)I', "LoadLibrary", "__stdcall")
 
 
 local game = LoadLibraryA("D:\\war3\\game.dll")

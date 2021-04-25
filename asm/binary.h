@@ -15,7 +15,6 @@ struct BinaryData
 {
     size_t size;
     void* code;
-    size_t code_size;
     char params[256];
     char name[256];
     CALL_TYPE type;

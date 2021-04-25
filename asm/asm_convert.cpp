@@ -62,40 +62,34 @@ int lua_error_print(lua_State* L, const char* err, ...)
 
 int asm_to_binary(lua_State* L)
 {
-    if (!lua_isstring(L, 1) || !lua_isinteger(L, 2))
+    if (!lua_isstring(L, 1))
         return 0;
 
 
-    size_t buffer_size = lua_tointeger(L, 2);
-
-    void* buffer = VirtualAlloc(NULL, buffer_size, MEM_RESERVE | MEM_COMMIT, PAGE_EXECUTE_READWRITE);
-
-    BinaryData** ptr = (BinaryData**)lua_newuserdata(L, sizeof(BinaryData*));
     BinaryData* data = new BinaryData();
-    *ptr = data;
+  
     g_current = data;
-    data->size = buffer_size;
-    data->code = buffer;
+
+    if (lua_isstring(L, 2))
+    {
+        size_t len = 0;
+        const char* info = lua_tolstring(L, 2, &len);
+
+        strncpy(data->params, info, len > 256 ? 256 : len);
+    }
+
     if (lua_isstring(L, 3))
     {
         size_t len = 0;
         const char* info = lua_tolstring(L, 3, &len);
 
-        strncpy(data->params, info, len > 256 ? 256 : len);
-    }
-
-    if (lua_isstring(L, 4))
-    {
-        size_t len = 0;
-        const char* info = lua_tolstring(L, 4, &len);
-
         strncpy(data->name, info, len > 256 ? 256 : len);
 
         symbol_map[data->name] = data;
     }
-    if (lua_isstring(L, 5))
+    if (lua_isstring(L, 4))
     {
-        const char* calltype = lua_tostring(L, 5);
+        const char* calltype = lua_tostring(L, 4);
 
         data->type = CALL_TYPE::C_CALL;
         if (strcmp(calltype, "__stdcall") == 0)
@@ -105,7 +99,7 @@ int asm_to_binary(lua_State* L)
             data->type = CALL_TYPE::THIS_CALL;
 
         else if (strcmp(calltype, "__fastcall") == 0)
-            data->type = CALL_TYPE::THIS_CALL;
+            data->type = CALL_TYPE::FAST_CALL;
     }
 
     ks_engine* ks;
@@ -119,21 +113,34 @@ int asm_to_binary(lua_State* L)
 
     err = ks_open(KS_ARCH_X86, KS_MODE_32, &ks);
     if (err != KS_ERR_OK) {
-        
+        delete data;
         return lua_error_print(L, "failed on ks_open()");
     }
     ks_option(ks, KS_OPT_SYNTAX, KS_OPT_SYNTAX_NASM);
     ks_option(ks, KS_OPT_SYM_RESOLVER, (size_t)asm_sym_resolver);
 
+    if (ks_asm(ks, code, 0, &encode, &size, &count) != KS_ERR_OK || size == 0) {
+        delete data;
+        return lua_error_print(L, "ERROR: ks_asm() failed & count = %d, error = %d\n",
+            count, ks_errno(ks));
+    }
+    ks_free(encode);
+
+    void* buffer = VirtualAlloc(NULL, size, MEM_RESERVE | MEM_COMMIT, PAGE_EXECUTE_READWRITE);
+    data->code = buffer;
+
     if (ks_asm(ks, code, (uint64_t)buffer, &encode, &size, &count) != KS_ERR_OK || size == 0) {
+        delete data;
         return lua_error_print(L, "ERROR: ks_asm() failed & count = %d, error = %d\n",
             count, ks_errno(ks));
     }
 
-    memcpy(buffer, encode, buffer_size < size ? buffer_size : size);
+    memcpy(buffer, encode, size);
 
 
-    data->code_size = size;
+    data->size = size;
+    BinaryData** ptr = (BinaryData**)lua_newuserdata(L, sizeof(BinaryData*));
+    *ptr = data;
    
     luaL_getmetatable(L, "binarydata");
 

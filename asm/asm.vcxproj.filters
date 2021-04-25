@@ -24,6 +24,9 @@
     <ClCompile Include="binary.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="call.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="asm.def">
@@ -35,6 +38,12 @@
       <Filter>源文件</Filter>
     </ClInclude>
     <ClInclude Include="binary.h">
+      <Filter>源文件</Filter>
+    </ClInclude>
+    <ClInclude Include="loop.h">
+      <Filter>源文件</Filter>
+    </ClInclude>
+    <ClInclude Include="call.h">
       <Filter>源文件</Filter>
     </ClInclude>
   </ItemGroup>

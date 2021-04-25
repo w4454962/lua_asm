@@ -38,7 +38,7 @@ local this_code = [[
     mov edx, [esp + 0x8]
     add eax, edx
     add eax, ecx 
-    ret 
+    ret 0x8
 ]]
 
 local this_code_object = asm.to_binary(this_code, 100, '(III)I', 'this_add')
@@ -53,7 +53,7 @@ local fast_code = [[
     mov eax, [esp + 0x4] 
     add ecx, edx 
     add eax, ecx 
-    ret
+    ret 0x4
 ]]
 local fast_code_object = asm.to_binary(fast_code, 100, '(III)I', 'fast_add')
 
@@ -85,14 +85,13 @@ local all_add_code = [[
     push 0x20000
     mov esi, this_add
     call esi
-    add esp, 0x8
 
     mov ecx, eax 
     mov edx, 0x100000
     push 0x200000
     mov esi, fast_add
     call esi
-    add esp, 0x4
+
 
     ret 
 ]]

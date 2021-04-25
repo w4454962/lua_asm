@@ -7,6 +7,8 @@
 #include <Windows.h>
 #include <memory>
 #include <vector>
+#include "call.h"
+
 int lua_error_print(lua_State* L, const char* err, ...);
 extern std::map<std::string, BinaryData*> symbol_map;
 
@@ -66,83 +68,7 @@ static int lgetaddress(lua_State* L)
 }
 
 
-#define intval sizeof uintptr_t
 
-uintptr_t c_call(uintptr_t func_address, const uintptr_t* param_list, size_t param_list_size)
-{
-	uintptr_t retval = 0;
-
-	for (size_t i = param_list_size; i > 0; i -= intval)
-	{
-		uintptr_t data = *(uintptr_t*)((uintptr_t)param_list + i - intval);
-		_asm push data 
-	}
-	_asm
-	{
-		call func_address
-		add esp, param_list_size
-		mov retval, eax 
-	}
-	return retval;
-}
-
-uintptr_t std_call(uintptr_t func_address, const uintptr_t* param_list, size_t param_list_size)
-{
-	uintptr_t retval;
-	
-	for (size_t i = param_list_size; i > 0; i -= intval)
-	{
-		uintptr_t data = *(uintptr_t*)((uintptr_t)param_list + i - intval);
-		_asm push data
-	}
-	_asm
-	{
-		call func_address
-		mov retval, eax
-	} 
-	return retval;
-}
-uintptr_t this_call(uintptr_t func_address, const uintptr_t* param_list, size_t param_list_size)
-{
-	uintptr_t retval;
-	uintptr_t first = param_list[0];
-	for (size_t i = param_list_size; i > intval; i -= intval)
-	{
-		uintptr_t data = *(uintptr_t*)((uintptr_t)param_list + i - intval);
-		_asm push data
-	}
-	param_list_size -= intval;
-	_asm
-	{
-		mov ecx, first
-		call func_address
-		add esp, param_list_size
-		mov retval, eax
-	}
-	return retval;
-}
-
-uintptr_t fast_call(uintptr_t func_address, const uintptr_t* param_list, size_t param_list_size)
-{
-	uintptr_t retval;
-	uintptr_t first = param_list[0];
-	uintptr_t second = param_list[1];
-	for (size_t i = param_list_size; i > intval * 2; i -= intval)
-	{
-		uintptr_t data = *(uintptr_t*)((uintptr_t)param_list + i - intval);
-		_asm push data
-	}
-	param_list_size -= intval * 2;
-	_asm
-	{
-		mov ecx, first
-		mov edx, second
-		call func_address
-		add esp, param_list_size
-		mov retval, eax
-	}
-	return retval;
-}
 
 
 uintptr_t call(CALL_TYPE type, uintptr_t func_address, const uintptr_t* param_list, size_t param_list_size)
@@ -307,6 +233,7 @@ int register_binary_class(lua_State* L)
 
 	lua_pushcfunction(L, lua_fast_call);
 	lua_setfield(L, -2, "fast_call");
+
 
     return 1;
 }

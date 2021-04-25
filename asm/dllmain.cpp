@@ -59,6 +59,7 @@ static int lua_tcall(lua_State* L)
 
 int luaopen_asm(lua_State * L)
 {
+
     luaL_checkversion(L);
 
     register_binary_class(L);

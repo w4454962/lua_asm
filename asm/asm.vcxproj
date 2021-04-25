@@ -109,7 +109,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(solutiondir)\third_party\keystone\include\;$(solutiondir)\third_party\lua\include\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(solutiondir)\third_party\keystone\include\;$(solutiondir)\third_party\lua\include\;$(projectdir)</AdditionalIncludeDirectories>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <Optimization>MinSpace</Optimization>
@@ -162,6 +162,7 @@
   <ItemGroup>
     <ClCompile Include="asm_convert.cpp" />
     <ClCompile Include="binary.cpp" />
+    <ClCompile Include="call.cpp" />
     <ClCompile Include="dllmain.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -170,6 +171,8 @@
   <ItemGroup>
     <ClInclude Include="asm_convert.h" />
     <ClInclude Include="binary.h" />
+    <ClInclude Include="call.h" />
+    <ClInclude Include="loop.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

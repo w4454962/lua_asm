@@ -9,6 +9,8 @@
 #include <vector>
 #include "fp_call2.h"
 
+
+
 int lua_error_print(lua_State* L, const char* err, ...);
 extern std::map<std::string, BinaryData*> symbol_map;
 
@@ -69,23 +71,23 @@ static int lgetaddress(lua_State* L)
 
 
 
+#define intval sizeof uintptr_t
 
-
-uintptr_t call(CALL_TYPE type, uintptr_t func_address, const uintptr_t* param_list, size_t param_list_size)
+uintptr_t call(CALL_TYPE type, uintptr_t func_address, const uintptr_t* param_list, size_t param_count)
 {
 	switch (type)
 	{
 	case CALL_TYPE::C_CALL:
-		return c_call(func_address, param_list, param_list_size);
+		return c_call(func_address, param_list, param_count);
 		break;
 	case CALL_TYPE::STD_CALL:
-		return std_call(func_address, param_list, param_list_size);
+		return std_call(func_address, param_list, param_count);
 		break;
 	case CALL_TYPE::THIS_CALL:
-		return this_call(func_address, param_list, param_list_size);
+		return this_call(func_address, param_list, param_count);
 		break;
 	case CALL_TYPE::FAST_CALL:
-		return fast_call(func_address, param_list, param_list_size);
+		return fast_call(func_address, param_list, param_count);
 		break;
 	default:
 		break;
@@ -112,7 +114,7 @@ static int lcall(lua_State* L, CALL_TYPE type)
 		switch (param[i])
 		{
 		case ')':
-			value = call(type, (uintptr_t)data->code, param_list, param_count * sizeof(uintptr_t));
+			value = call(type, (uintptr_t)data->code, param_list, param_count);
 			input = 0;
 			break;
 		case '(':

@@ -7,16 +7,35 @@ uintptr_t empty_func()
 {
 	return 0;
 }
+
+HMODULE get_module()
+{
+	HMODULE handle;
+
+	const char* list[] = {
+		"luacore.dll",
+		"lua53.dll",
+		"lua.dll",
+	};
+
+	for (int i = 0; i < sizeof(list) / sizeof(const char*); i++)
+	{
+		handle = GetModuleHandleA(list[i]);
+		if (handle) return handle;
+	}
+	for (int i = 0; i < sizeof(list) / sizeof(const char*); i++)
+	{
+		handle = LoadLibraryA(list[i]);
+		if (handle) return handle;
+	}
+
+	return GetModuleHandleA(nullptr);
+}
+
 uintptr_t get_proaddress(const char* name)
 {
-	HMODULE handle = GetModuleHandleA("luacore.dll");
-	if (!handle) handle = LoadLibraryA("luacore.dll");
-	if (!handle) handle = GetModuleHandleA("lua53.dll");
-	if (!handle) handle = LoadLibraryA("lua53.dll");
-	if (!handle) handle = GetModuleHandleA(nullptr);
-	if (handle != 0)
-		return (uintptr_t)GetProcAddress(handle, name);
-	return (uintptr_t)&empty_func;
+	static HMODULE handle = get_module();
+	return (uintptr_t)GetProcAddress(handle, name);
 }
 
 lua_State * lua_newstate(lua_Alloc f, void* ud) {

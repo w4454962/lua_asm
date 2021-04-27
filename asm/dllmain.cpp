@@ -6,7 +6,6 @@
 #include "asm_convert.h"
 #include "binary.h"
 
-#pragma comment(lib, "luacore.lib")
 #pragma comment(lib, "keystone.lib")
 
 

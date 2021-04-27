@@ -164,6 +164,9 @@
     <ClCompile Include="binary.cpp" />
     <ClCompile Include="fp_call2.cpp" />
     <ClCompile Include="dllmain.cpp" />
+    <ClCompile Include="lua.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="asm.def" />
@@ -171,6 +174,7 @@
   <ItemGroup>
     <ClInclude Include="asm_convert.h" />
     <ClInclude Include="binary.h" />
+    <ClInclude Include="fp_call.h" />
     <ClInclude Include="fp_call2.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

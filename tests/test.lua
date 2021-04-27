@@ -1,4 +1,4 @@
-package.path = package.path .. ';..\\tests\\?.lua;'
+package.path = package.path .. ';..\\..\\tests\\?.lua;'
 
 require 'add_function'
 
@@ -11,3 +11,12 @@ print('111111')
 --
 --print(game)
 
+local ffi = require 'ffi'
+
+print(ffi)
+
+ffi.cdef [[
+    int MessageBoxA(int, const char*, const char*, int);
+]]
+
+ffi.C.MessageBoxA(0, "aa", "bb", 0)

@@ -43,7 +43,7 @@ void track_stack(std::vector<StackFuncInfo>& list)
 	}
 }
 //初始化当前模块的时候 从调用堆栈里拿到宿主的handle
-void init_lua_module()
+extern "C" void init_lua_module()
 {
 	std::vector<StackFuncInfo> list;
 

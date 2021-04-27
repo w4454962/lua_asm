@@ -32,11 +32,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="asm.def">
-      <Filter>资源文件</Filter>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
     <ClInclude Include="asm_convert.h">
       <Filter>源文件</Filter>
     </ClInclude>

@@ -7,9 +7,9 @@
 #include "binary.h"
 
 #pragma comment(lib, "keystone.lib")
+# define EXPORT __declspec(dllexport)
 
-
-void init_lua_module();
+extern "C" void init_lua_module();
 
 BOOL APIENTRY DllMain( HMODULE hModule,
                        DWORD  ul_reason_for_call,
@@ -56,10 +56,10 @@ static int lua_tcall(lua_State* L)
 }
 
 
-
-int luaopen_asm(lua_State * L)
+EXTERN_C EXPORT int luaopen_asm(lua_State * L)
 {
     init_lua_module();
+
 
     luaL_checkversion(L);
 

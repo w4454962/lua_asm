@@ -54,17 +54,17 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <OutDir>$(ProjectDir)bin\Release\</OutDir>
+    <OutDir>$(ProjectDir)..\..\..\bin\$(Configuration)\</OutDir>
     <IntDir>$(ProjectDir)tmp\$(ProjectName)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>$(ProjectDir)bin\$(Configuration)\</OutDir>
+    <OutDir>$(ProjectDir)..\..\..\bin\$(Configuration)\</OutDir>
     <IntDir>$(ProjectDir)tmp\$(ProjectName)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='XP|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>$(ProjectDir)bin\$(Configuration)\XP\</OutDir>
+    <OutDir>$(ProjectDir)..\..\..\bin\$(Configuration)\</OutDir>
     <IntDir>$(ProjectDir)tmp\$(ProjectName)\$(Configuration)\XP\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">

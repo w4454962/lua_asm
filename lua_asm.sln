@@ -10,6 +10,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "lua_asm", "lua_asm\lua_asm.
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "asm", "asm\asm.vcxproj", "{494842CB-8CC1-4160-AB17-7326E05411D1}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ffi", "ffi\makefiles\ffi.vcxproj", "{076A366B-6B75-4D35-A6A9-CA680F0771E3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -34,6 +36,12 @@ Global
 		{494842CB-8CC1-4160-AB17-7326E05411D1}.Release|x64.Build.0 = Release|x64
 		{494842CB-8CC1-4160-AB17-7326E05411D1}.Release|x86.ActiveCfg = Release|Win32
 		{494842CB-8CC1-4160-AB17-7326E05411D1}.Release|x86.Build.0 = Release|Win32
+		{076A366B-6B75-4D35-A6A9-CA680F0771E3}.Debug|x64.ActiveCfg = Debug|Win32
+		{076A366B-6B75-4D35-A6A9-CA680F0771E3}.Debug|x86.ActiveCfg = Debug|Win32
+		{076A366B-6B75-4D35-A6A9-CA680F0771E3}.Debug|x86.Build.0 = Debug|Win32
+		{076A366B-6B75-4D35-A6A9-CA680F0771E3}.Release|x64.ActiveCfg = Release|Win32
+		{076A366B-6B75-4D35-A6A9-CA680F0771E3}.Release|x86.ActiveCfg = Release|Win32
+		{076A366B-6B75-4D35-A6A9-CA680F0771E3}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

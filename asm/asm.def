@@ -1,6 +1,0 @@
-LIBRARY      "asm"
-
-EXPORTS 
-
-
-luaopen_asm

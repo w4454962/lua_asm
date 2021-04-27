@@ -3,11 +3,6 @@
 #include <windows.h>
 using namespace base;
 
-uintptr_t empty_func()
-{
-	return 0;
-}
-
 HMODULE get_module()
 {
 	HMODULE handle;

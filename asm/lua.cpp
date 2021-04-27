@@ -1,13 +1,7 @@
 #include <lua.hpp>
 #include <windows.h>
-#include "dbghelp.h"
-#include <sstream>
-#include <iostream>
 #include <vector>
-#include <tchar.h>
 
-
-#pragma comment(lib, "dbghelp.lib")
 /*
 该文件的作用是为了处理 动态加载lua时， 宿主存在多个lua模块 并且不同名字混乱的问题。
 */

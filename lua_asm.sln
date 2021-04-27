@@ -5,6 +5,7 @@ VisualStudioVersion = 16.0.30621.155
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "lua_asm", "lua_asm\lua_asm.vcxproj", "{A69CC86B-6F10-45CA-9010-6DD4192A68E5}"
 	ProjectSection(ProjectDependencies) = postProject
+		{076A366B-6B75-4D35-A6A9-CA680F0771E3} = {076A366B-6B75-4D35-A6A9-CA680F0771E3}
 		{494842CB-8CC1-4160-AB17-7326E05411D1} = {494842CB-8CC1-4160-AB17-7326E05411D1}
 	EndProjectSection
 EndProject

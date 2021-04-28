@@ -6,7 +6,6 @@
 #include "asm_convert.h"
 #include "binary.h"
 
-#pragma comment(lib, "keystone.lib")
 # define EXPORT __declspec(dllexport)
 
 extern "C" void init_lua_module();

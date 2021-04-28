@@ -11,7 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\asm\lua.cpp" />
+    <ClCompile Include="..\..\..\asm\lua.cpp" />
     <ClCompile Include="..\src\call.c" />
     <ClCompile Include="..\src\ctype.c" />
     <ClCompile Include="..\src\ffi.c" />

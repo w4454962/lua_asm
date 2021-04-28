@@ -24,7 +24,7 @@
     <ClCompile Include="..\src\parser.c">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\asm\lua.cpp">
+    <ClCompile Include="..\..\..\asm\lua.cpp">
       <Filter>source</Filter>
     </ClCompile>
   </ItemGroup>

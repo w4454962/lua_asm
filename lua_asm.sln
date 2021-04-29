@@ -6,7 +6,6 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "asm", "asm\asm.vcxproj", "{494842CB-8CC1-4160-AB17-7326E05411D1}"
 	ProjectSection(ProjectDependencies) = postProject
 		{B84F7231-16CE-41D8-8C08-7B523FF4225B} = {B84F7231-16CE-41D8-8C08-7B523FF4225B}
-		{076A366B-6B75-4D35-A6A9-CA680F0771E3} = {076A366B-6B75-4D35-A6A9-CA680F0771E3}
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "luacore", "third_party\lua\build\luacore.vcxproj", "{B84F7231-16CE-41D8-8C08-7B523FF4225B}"
@@ -17,6 +16,9 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "lua", "third_party\lua\buil
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ffi", "third_party\luaffi\makefiles\ffi.vcxproj", "{076A366B-6B75-4D35-A6A9-CA680F0771E3}"
+	ProjectSection(ProjectDependencies) = postProject
+		{76338556-5419-494A-A4C6-D79090629054} = {76338556-5419-494A-A4C6-D79090629054}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

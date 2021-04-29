@@ -19,7 +19,7 @@ local std_code = [[
     ret  0x8
 ]]
 
-local std_add = asm.to_binary(std_code, '(III)I', 'std_add', '__stdcall')
+local std_add = asm.to_binary(std_code, '(II)I', 'std_add', '__stdcall')
 
 print('memory address', std_add:get_address())
 

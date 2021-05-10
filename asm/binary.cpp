@@ -70,6 +70,15 @@ static int lgetaddress(lua_State* L)
 }
 
 
+static int lgetcode(lua_State* L)
+{
+	BinaryData** ptr = (BinaryData**)luaL_checkudata(L, 1, "binarydata");
+	luaL_argcheck(L, ptr != NULL, 1, "invalid user data");
+	BinaryData* data = *ptr;
+	lua_pushlstring(L, (const char*)data->code, data->size);
+	return 1;
+}
+
 
 #define intval sizeof uintptr_t
 
@@ -220,6 +229,9 @@ int register_binary_class(lua_State* L)
 
     lua_pushcfunction(L, lgetaddress);
     lua_setfield(L, -2, "get_address");
+
+	lua_pushcfunction(L, lgetcode);
+	lua_setfield(L, -2, "get_code");
 
 	lua_pushcfunction(L, lua_default_call);
 	lua_setfield(L, -2, "__call");

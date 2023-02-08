@@ -51,11 +51,12 @@ local fast_add = asm.to_binary(fast_code, '(III)I', 'fast_add', '__fastcall')
 
 local all_add_code = [[
 
-    push ebx
-    push ecx
-    push edx
-    push esi
-    push edi
+    push ebp
+    mov ebp, esp 
+    push eax 
+
+    pushad
+    pushfd
 
     push 0x300
     push 0x200
@@ -81,13 +82,13 @@ local all_add_code = [[
     push 0x200000
     mov esi, fast_add
     call esi
+    mov [ebp - 4], eax 
 
-
-    pop edi
-    pop esi
-    pop edx
-    pop ecx
-    pop ebx
+    popfd
+    popad
+    
+    pop eax 
+    pop ebp
 
     ret 
 ]]

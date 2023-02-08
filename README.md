@@ -2,7 +2,7 @@
 在lua里用asmjit + asmtk 即时将文本编译成机器码 并执行的项目
 
 
-项目只配置了 vs2019的Resele|Debug  x86|win32 编译配置
+项目只配置了 vs2022的Resele|Debug  x86|win32 编译配置
 
 
 例子

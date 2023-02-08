@@ -1,7 +1,7 @@
 ﻿// dllmain.cpp : 定义 DLL 应用程序的入口点。
 #include <windows.h>
 
-#include <keystone\keystone.h>
+
 #include <lua.hpp>
 #include "asm_convert.h"
 #include "binary.h"

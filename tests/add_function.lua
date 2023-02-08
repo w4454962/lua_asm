@@ -51,7 +51,6 @@ local fast_add = asm.to_binary(fast_code, '(III)I', 'fast_add', '__fastcall')
 
 local all_add_code = [[
 
-    //保存一下寄存器
     push ebx
     push ecx
     push edx
@@ -83,8 +82,7 @@ local all_add_code = [[
     mov esi, fast_add
     call esi
 
-  
-    //恢复寄存器
+
     pop edi
     pop esi
     pop edx

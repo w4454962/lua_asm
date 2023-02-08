@@ -1,10 +1,14 @@
 #include <Windows.h>
 #include <memory>
-#include <keystone\keystone.h>
+#include <asmjit/x86.h>
+#include <asmtk/asmtk.h>
 #include "asm_convert.h"
 #include "binary.h"
 #include <regex>
 #include <map>
+
+using namespace asmjit;
+using namespace asmtk;
 
 BinaryData* g_current;
 
@@ -50,6 +54,45 @@ bool asm_sym_resolver(const char* symbol, uint64_t* value)
 }
 
 
+static Error ASMJIT_CDECL unknownSymbolHandler(AsmParser* parser, Operand* dst, const char* symbol, size_t size) {
+    void* data = parser->unknownSymbolHandlerData();
+    //printf("SymbolHandler called on symbol '%.*s' (data %p)\n", int(size), symbol, data);
+
+    std::string str = std::string(symbol, size);
+
+    auto it = symbol_map.find(str);
+    if (it != symbol_map.end())
+    {
+        auto* data = it->second;
+        *dst = imm((uintptr_t)data->code);
+
+        auto& map = g_current->ref_map;
+        if (map.find(str) == map.end())
+        {
+            data->ref_count++;
+            map[str] = data;
+        }
+        return kErrorOk;
+    }
+
+    std::regex reg("(\\w+)\\.(\\w+)");
+    auto words_begin = std::sregex_iterator(str.begin(), str.end(), reg);
+    auto words_end = std::sregex_iterator();
+    for (; words_begin != words_end; ++words_begin)
+    {
+        std::string module_name = words_begin->str(1);
+        std::string proname = words_begin->str(2);
+        HMODULE handle = GetModuleHandleA(module_name.c_str());
+        if (!handle) handle = LoadLibraryA(module_name.c_str());
+        if (handle)
+        {
+            *dst = imm(GetProcAddress(handle, proname.c_str()));
+            return kErrorOk;
+        }
+    }
+    return kErrorOk;
+}
+
 int lua_error_print(lua_State* L, const char* err, ...)
 {
     va_list ap;
@@ -58,6 +101,14 @@ int lua_error_print(lua_State* L, const char* err, ...)
     return lua_error(L);
 }
 
+
+#ifdef _WIN32
+Environment env(Arch::kX86);
+
+#elif _WIN64
+Environment env(Arch::kX64);
+
+#endif // _WIN32
 
 
 int asm_to_binary(lua_State* L)
@@ -104,53 +155,52 @@ int asm_to_binary(lua_State* L)
             data->type = CALL_TYPE::C_CALL;
     }
 
-    ks_engine* ks;
-    ks_err err;
-    size_t count;
-    size_t size;
-    const char* code = lua_tolstring(L, 1, &size);
-
-    unsigned char* encode;
+    size_t text_size;
+    const char* text = lua_tolstring(L, 1, &text_size);
 
 
-    err = ks_open(KS_ARCH_X86, KS_MODE_32, &ks);
-    if (err != KS_ERR_OK) {
-        delete data;
-        return lua_error_print(L, "failed on ks_open()");
+    CodeHolder code;
+
+    auto err = code.init(env, 0);
+    if (err != kErrorOk) {
+        printf("%s\n", DebugUtils::errorAsString(err));
+        return false;
     }
-    ks_option(ks, KS_OPT_SYNTAX, KS_OPT_SYNTAX_NASM);
-    ks_option(ks, KS_OPT_SYM_RESOLVER, (size_t)asm_sym_resolver);
 
-    if (ks_asm(ks, code, 0, &encode, &size, &count) != KS_ERR_OK || size == 0) {
-        delete data;
-        return lua_error_print(L, "ERROR: ks_asm() failed & count = %d, error = %d\n",
-            count, ks_errno(ks));
+    
+    x86::Assembler assembler(&code);
+
+    AsmParser parser(&assembler);
+
+    parser.setUnknownSymbolHandler(unknownSymbolHandler);
+
+    err = parser.parse(text, text_size);
+    if (err != kErrorOk) {
+        printf("%s\n%s\n", text, DebugUtils::errorAsString(err));
+        return false;
     }
-    ks_free(encode);
 
-    void* buffer = VirtualAlloc(NULL, size, MEM_RESERVE | MEM_COMMIT, PAGE_EXECUTE_READWRITE);
+    // Check for unresolved relocations
+    if (code._relocations.size()) {
+        printf("unresolved relocation\n");
+        return false;
+    }
+
+    void* buffer = VirtualAlloc(NULL, code.codeSize(), MEM_RESERVE | MEM_COMMIT, PAGE_EXECUTE_READWRITE);
     data->code = buffer;
+    data->size = code.codeSize();
 
-    if (ks_asm(ks, code, (uint64_t)buffer, &encode, &size, &count) != KS_ERR_OK || size == 0) {
-        delete data;
-        return lua_error_print(L, "ERROR: ks_asm() failed & count = %d, error = %d\n",
-            count, ks_errno(ks));
-    }
-
-    memcpy(buffer, encode, size);
+    code.relocateToBase((uint64_t)buffer);
+ 
+    code.copyFlattenedData(buffer, code.codeSize());
 
 
-    data->size = size;
     BinaryData** ptr = (BinaryData**)lua_newuserdata(L, sizeof(BinaryData*));
     *ptr = data;
    
     luaL_getmetatable(L, "binarydata");
 
     lua_setmetatable(L, -2);
-    // NOTE: free encode after usage to avoid leaking memory
-    ks_free(encode);
 
-    // close Keystone instance when done
-    ks_close(ks);
     return 1;
 }

@@ -29,13 +29,13 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
@@ -93,15 +93,15 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(solutiondir)\third_party\keystone\include\;$(solutiondir)\third_party\lua\include\;$(projectdir)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalIncludeDirectories>$(solutiondir)\third_party\asmjit\src\;$(solutiondir)\third_party\asmtk\src\;$(solutiondir)\third_party\lua\include\;$(projectdir)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalLibraryDirectories>$(solutiondir)\third_party\keystone\lib;$(solutiondir)\bin\$(Configuration)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>debug_keystone.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(solutiondir)\bin\$(Configuration)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -114,9 +114,9 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(solutiondir)\third_party\keystone\include\;$(solutiondir)\third_party\lua\include\;$(projectdir)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(solutiondir)\third_party\asmjit\src\;$(solutiondir)\third_party\asmtk\src\;$(solutiondir)\third_party\lua\include\;$(projectdir)</AdditionalIncludeDirectories>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
-      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard>stdcpp20</LanguageStandard>
       <Optimization>MinSpace</Optimization>
     </ClCompile>
     <Link>
@@ -125,11 +125,12 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalLibraryDirectories>$(solutiondir)\third_party\keystone\lib;$(solutiondir)\bin\$(Configuration)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(solutiondir)\bin\$(Configuration)</AdditionalLibraryDirectories>
       <ModuleDefinitionFile>
       </ModuleDefinitionFile>
-      <IgnoreSpecificDefaultLibraries>libcmt.lib</IgnoreSpecificDefaultLibraries>
-      <AdditionalDependencies>keystone.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <IgnoreSpecificDefaultLibraries>
+      </IgnoreSpecificDefaultLibraries>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
       <Command>
@@ -171,6 +172,66 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\third_party\asmjit\src\asmjit\arm\a64assembler.cpp" />
+    <ClCompile Include="..\third_party\asmjit\src\asmjit\arm\a64builder.cpp" />
+    <ClCompile Include="..\third_party\asmjit\src\asmjit\arm\a64compiler.cpp" />
+    <ClCompile Include="..\third_party\asmjit\src\asmjit\arm\a64emithelper.cpp" />
+    <ClCompile Include="..\third_party\asmjit\src\asmjit\arm\a64formatter.cpp" />
+    <ClCompile Include="..\third_party\asmjit\src\asmjit\arm\a64func.cpp" />
+    <ClCompile Include="..\third_party\asmjit\src\asmjit\arm\a64instapi.cpp" />
+    <ClCompile Include="..\third_party\asmjit\src\asmjit\arm\a64instdb.cpp" />
+    <ClCompile Include="..\third_party\asmjit\src\asmjit\arm\a64operand.cpp" />
+    <ClCompile Include="..\third_party\asmjit\src\asmjit\arm\a64rapass.cpp" />
+    <ClCompile Include="..\third_party\asmjit\src\asmjit\arm\armformatter.cpp" />
+    <ClCompile Include="..\third_party\asmjit\src\asmjit\core\archtraits.cpp" />
+    <ClCompile Include="..\third_party\asmjit\src\asmjit\core\assembler.cpp" />
+    <ClCompile Include="..\third_party\asmjit\src\asmjit\core\builder.cpp" />
+    <ClCompile Include="..\third_party\asmjit\src\asmjit\core\codeholder.cpp" />
+    <ClCompile Include="..\third_party\asmjit\src\asmjit\core\codewriter.cpp" />
+    <ClCompile Include="..\third_party\asmjit\src\asmjit\core\compiler.cpp" />
+    <ClCompile Include="..\third_party\asmjit\src\asmjit\core\constpool.cpp" />
+    <ClCompile Include="..\third_party\asmjit\src\asmjit\core\cpuinfo.cpp" />
+    <ClCompile Include="..\third_party\asmjit\src\asmjit\core\emithelper.cpp" />
+    <ClCompile Include="..\third_party\asmjit\src\asmjit\core\emitter.cpp" />
+    <ClCompile Include="..\third_party\asmjit\src\asmjit\core\emitterutils.cpp" />
+    <ClCompile Include="..\third_party\asmjit\src\asmjit\core\environment.cpp" />
+    <ClCompile Include="..\third_party\asmjit\src\asmjit\core\errorhandler.cpp" />
+    <ClCompile Include="..\third_party\asmjit\src\asmjit\core\formatter.cpp" />
+    <ClCompile Include="..\third_party\asmjit\src\asmjit\core\func.cpp" />
+    <ClCompile Include="..\third_party\asmjit\src\asmjit\core\funcargscontext.cpp" />
+    <ClCompile Include="..\third_party\asmjit\src\asmjit\core\globals.cpp" />
+    <ClCompile Include="..\third_party\asmjit\src\asmjit\core\inst.cpp" />
+    <ClCompile Include="..\third_party\asmjit\src\asmjit\core\jitallocator.cpp" />
+    <ClCompile Include="..\third_party\asmjit\src\asmjit\core\jitruntime.cpp" />
+    <ClCompile Include="..\third_party\asmjit\src\asmjit\core\logger.cpp" />
+    <ClCompile Include="..\third_party\asmjit\src\asmjit\core\operand.cpp" />
+    <ClCompile Include="..\third_party\asmjit\src\asmjit\core\osutils.cpp" />
+    <ClCompile Include="..\third_party\asmjit\src\asmjit\core\ralocal.cpp" />
+    <ClCompile Include="..\third_party\asmjit\src\asmjit\core\rapass.cpp" />
+    <ClCompile Include="..\third_party\asmjit\src\asmjit\core\rastack.cpp" />
+    <ClCompile Include="..\third_party\asmjit\src\asmjit\core\string.cpp" />
+    <ClCompile Include="..\third_party\asmjit\src\asmjit\core\support.cpp" />
+    <ClCompile Include="..\third_party\asmjit\src\asmjit\core\target.cpp" />
+    <ClCompile Include="..\third_party\asmjit\src\asmjit\core\type.cpp" />
+    <ClCompile Include="..\third_party\asmjit\src\asmjit\core\virtmem.cpp" />
+    <ClCompile Include="..\third_party\asmjit\src\asmjit\core\zone.cpp" />
+    <ClCompile Include="..\third_party\asmjit\src\asmjit\core\zonehash.cpp" />
+    <ClCompile Include="..\third_party\asmjit\src\asmjit\core\zonelist.cpp" />
+    <ClCompile Include="..\third_party\asmjit\src\asmjit\core\zonestack.cpp" />
+    <ClCompile Include="..\third_party\asmjit\src\asmjit\core\zonetree.cpp" />
+    <ClCompile Include="..\third_party\asmjit\src\asmjit\core\zonevector.cpp" />
+    <ClCompile Include="..\third_party\asmjit\src\asmjit\x86\x86assembler.cpp" />
+    <ClCompile Include="..\third_party\asmjit\src\asmjit\x86\x86builder.cpp" />
+    <ClCompile Include="..\third_party\asmjit\src\asmjit\x86\x86compiler.cpp" />
+    <ClCompile Include="..\third_party\asmjit\src\asmjit\x86\x86emithelper.cpp" />
+    <ClCompile Include="..\third_party\asmjit\src\asmjit\x86\x86formatter.cpp" />
+    <ClCompile Include="..\third_party\asmjit\src\asmjit\x86\x86func.cpp" />
+    <ClCompile Include="..\third_party\asmjit\src\asmjit\x86\x86instapi.cpp" />
+    <ClCompile Include="..\third_party\asmjit\src\asmjit\x86\x86instdb.cpp" />
+    <ClCompile Include="..\third_party\asmjit\src\asmjit\x86\x86operand.cpp" />
+    <ClCompile Include="..\third_party\asmjit\src\asmjit\x86\x86rapass.cpp" />
+    <ClCompile Include="..\third_party\asmtk\src\asmtk\asmparser.cpp" />
+    <ClCompile Include="..\third_party\asmtk\src\asmtk\asmtokenizer.cpp" />
     <ClCompile Include="asm_convert.cpp" />
     <ClCompile Include="binary.cpp" />
     <ClCompile Include="fp_call2.cpp" />

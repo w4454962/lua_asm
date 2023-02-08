@@ -14,46 +14,6 @@ BinaryData* g_current;
 
 std::map<std::string, BinaryData*> symbol_map;
 
-bool asm_sym_resolver(const char* symbol, uint64_t* value)
-{
-    std::string str = symbol;
-
-    auto it = symbol_map.find(str);
-    if (it != symbol_map.end())
-    {
-        auto* data = it->second;
-        *value = (uint64_t)data->code;
-
-        auto& map = g_current->ref_map;
-        if (map.find(str) == map.end())
-        {
-            data->ref_count++;
-            map[str] = data;
-        }
-       
-        return true;
-    }
-
-    std::regex reg("(\\w+)\\.(\\w+)");
-    auto words_begin = std::sregex_iterator(str.begin(), str.end(), reg);
-    auto words_end = std::sregex_iterator();
-    for (; words_begin != words_end; ++words_begin)
-    {
-        std::string module_name = words_begin->str(1);
-        std::string proname = words_begin->str(2);
-        HMODULE handle = GetModuleHandleA(module_name.c_str());
-        if (!handle) handle = LoadLibraryA(module_name.c_str());
-        if (handle)
-        {
-            *value = (uint64_t)GetProcAddress(handle, proname.c_str());
-            return true;
-        }
-    }
-
-    return false;
-}
-
-
 static Error ASMJIT_CDECL unknownSymbolHandler(AsmParser* parser, Operand* dst, const char* symbol, size_t size) {
     void* data = parser->unknownSymbolHandlerData();
     //printf("SymbolHandler called on symbol '%.*s' (data %p)\n", int(size), symbol, data);

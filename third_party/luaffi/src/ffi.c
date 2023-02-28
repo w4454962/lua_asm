@@ -2574,6 +2574,12 @@ static int cdata_tostring(lua_State* L)
         lua_pushfstring(L, "cdata<%s>: %p", lua_tostring(L, -1), *(void**) p);
         return 1;
 
+	case FUNCTION_TYPE:
+		push_type_name(L, -1, &ct);
+		lua_pushfstring(L, "cdata<%s>: %p", lua_tostring(L, -1), *(void**)p);
+		return 1;
+
+
     case INTPTR_TYPE:
         lua_pushfstring(L, "%p", *(uintptr_t*) p);
         return 1;
@@ -3469,13 +3475,8 @@ static void setup_mt(lua_State* L, const luaL_Reg* mt, int upvals)
     luaL_setfuncs(L, mt, upvals);
 }
 
-
-void init_lua_module();
-
 int luaopen_ffi(lua_State* L)
 {
-    init_lua_module();
-
     lua_settop(L, 0);
 
     lua_newtable(L);

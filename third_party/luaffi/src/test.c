@@ -6,6 +6,7 @@
  * LICENSE file in the root directory of this source tree. An additional grant
  * of patent rights can be found in the PATENTS file in the same directory.
  */
+#define _XOPEN_SOURCE 600
 #include <stdio.h>
 #include <stdint.h>
 #include <inttypes.h>
@@ -19,8 +20,10 @@
 #include <errno.h>
 #endif
 
+#if __STDC_VERSION__+0 >= 199901L
 #include <complex.h>
 #define HAVE_COMPLEX
+#endif
 
 #ifdef __cplusplus
 # define EXTERN_C extern "C"

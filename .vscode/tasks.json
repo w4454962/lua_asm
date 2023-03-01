@@ -1,0 +1,19 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "运行",
+            "type": "shell",
+            "command": "bin\\Release\\lua.exe",
+            "args": [
+                "tests\\test_ffi_fastcall.lua"
+            ],
+            "group": {
+                "kind": "test",
+                "isDefault": true
+            }
+        },
+    ]
+}

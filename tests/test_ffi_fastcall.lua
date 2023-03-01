@@ -82,7 +82,9 @@ print('test 2', test_code_func() )
 --ffi make fastcall 
 
 local ffi_fast_call_func = ffi.cast('TestFunc', function (ecx, edx, r1, r2)
-    return ecx + edx + r1 + r2 
+    local ret = ecx + edx + r1 + r2 
+    print('ffi run add', ret)
+    return ret
 end)
 
 print('ffi fastcall', ffi_fast_call_func(10,20,30,40))
@@ -108,6 +110,7 @@ local ffi_test_code_func = asm.to_binary(ffi_test_code, '()I', '', '__fastcall')
 local ffi_test_addr = ffi_test_code_func:get_address()
 
 ------------------ 在这个步骤开始会崩溃 -------------------------------
+print('crash start')
 
 print('ffi test 1', ffi_newfunc('int(*)()', ffi_test_addr)())
 
